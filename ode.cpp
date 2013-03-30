@@ -15,7 +15,7 @@ void update_odo(odotype *p)
 
   int delta;
   double dUr, dUl, dU, dTheta;
-  
+
   delta = p->right_enc - p->right_enc_old;
   /* if (delta > 0x8000) delta -= 0x10000; */
   /* else if (delta < -0x8000) delta += 0x10000; */
@@ -27,7 +27,7 @@ void update_odo(odotype *p)
   // p->cr is c_m in notes. Eg. only dependent on physical parameters
   // delta is N_L/R in notes.
 
-  delta = p->left_enc - p->left_enc_old;
+  delta = -(p->left_enc - p->left_enc_old);
   /* if (delta > 0x8000) delta -= 0x10000; */
   /* else if (delta < -0x8000) delta += 0x10000; */
   p->left_enc_old = p->left_enc;

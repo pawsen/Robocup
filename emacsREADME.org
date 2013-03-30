@@ -1,7 +1,10 @@
 
 Get emacs and Arduino to play well together:
+* Arduino and cedet/ECB (the hard way)
+http://www.randomsample.de/cedetdocs/common/cedet/Arduino-Features.html
+http://stackoverflow.com/questions/12711765/status-of-cedet-and-ecb-in-emacs-24-2
 
-
+* Arduino the easy way
 From [[http://emacswiki.org/emacs/ArduinoSupport][ArduinoSupport]]:
 
 EMACS stuff:
@@ -22,9 +25,9 @@ OUTSIDE EMACS(Not sure if that's possible)
   $ sudo git clone git://github.com/mjoldfield/Arduino-Makefile.git
   && sudo move Arduino-Makefile arduino-mk (kør ikke alligevel)
 - Set variables for the makefile in ~/.bashrc (could also be set locally in the project Makefile)
-  ARDUINO_DIR   = /usr/share/arduino
-  ARDMK_DIR     = /usr/local
-  AVR_TOOLS_DIR = /usr
+  ARDUINO_DIR=/usr/share/arduino
+  ARDMK_DIR=/usr/local
+  AVR_TOOLS_DIR= /usr
 - Install needed stuff for the cli
   $ sudo apt-get install libdevice-serialport-perl libyaml-perl
 
@@ -32,8 +35,70 @@ OUTSIDE EMACS(Not sure if that's possible)
 Example makefile
 (examples are found in $ cd /usr/share/arduino/Arduino-Makefile/examples/)
 
-BOARD_TAG    = uno or 
+BOARD_TAG    = uno or atmega328 (for Arduino Duemilanove w/ ATmega328)
 ARDUINO_PORT = /dev/cu.usb*
 ARDUINO_LIBS = 
 
 include ../../arduino-mk/Arduino.m
+
+* Read the serial port
+
+** Installer gnu screen
+
+$ sudo apt-get install screen
+$ screen [serial-port] [baud-rate] , 9600 is standard  eg
+$ screen /dev/ttyUSB0
+
+*** Betjening af screen
+Info her
+https://wiki.archlinux.org/index.php/GNU_Screen
+
+Vigtigste commando
+C-a ? : viser info
+C-a k : kill screen
+C-a d : deattach. Connect igen ved screen -r
+C-a ESC : stop scrolling. Start again by pressing ESC
+
+**** ~/.screenrc
+tilføj til ~/.screenrc
+
+# 256 colors in screen
+term screen-256color
+
+# Use X scrolling mechanism
+termcapinfo xterm* ti@:te@
+
+# dont show startup-message
+startup_message off
+
+# Informative statusbar (virker ikke?)
+hardstatus off
+hardstatus alwayslastline
+hardstatus string '%{= kG}[ %{G}%H %{g}][%= %{= kw}%?%-Lw%?%{r}(%{W}%n*%f%t%?(%u)%?%{r})%{w}%?%+Lw%?%?%= %{g}][%{B} %m-%d %{W} %c %{g}]'
+
+** Eller sæt porten op manuelt
+Initialiser med
+
+$ stty -F /dev/ttyUSB0 sane raw pass8 -echo -hupcl clocal 9600
+
+Så kan porten tilgås vil cat/tail etc.
+
+Bemærk at opsætningen slettes hvis porten åbnes via arduino IDE, og så skal den opsættes igen.
+
+Hvis man læser fra porten som read-only bør det være muligt at have flere programmer til at læse fra den samtidig. Fx både cat og tail samtidig.
+
+Men hvis porten tilgås som read/write, kan kun et program læse fra den. Arduino IDE tilgår den som read/write.
+
+*** Forklaring på nogle af parametrene til stty
+Fra [[http://stackoverflow.com/a/11711178/1121523][stackOverflow]]
+
+Especially the the missing clocal might prevent you opening the TTY.
+
+Second: When the device is open, you should wait a little before sending
+anything. By default the Arduino resets when the serial line is opened or
+closed. You have to take this into account.
+
+The -hupcl part will prevent this reset most of the time. But at least one reset
+is always necessary, because -hupcl can be set only when the TTY is already open
+and at that time the Arduino has received the reset signal already. So -hupcl
+will "only" prevent future resets.

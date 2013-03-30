@@ -1,5 +1,5 @@
-#ifndef motion_h
-#define motion_h
+#ifndef MOTION_H
+#define MOTION_H
 
 
 typedef struct{//input
@@ -24,6 +24,9 @@ typedef struct{
 }smtype;
 
 void update_motcon(motiontype *p);
-void sm_update(smtype *p);
+void stop_motor(motiontype *p);
+
+/* motion type. */
+enum {mot_stop=1,mot_move,mot_turn};
 
 #endif
