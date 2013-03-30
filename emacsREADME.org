@@ -1,0 +1,39 @@
+
+Get emacs and Arduino to play well together:
+
+
+From [[http://emacswiki.org/emacs/ArduinoSupport][ArduinoSupport]]:
+
+EMACS stuff:
+- Download [[https://github.com/bookest/arduino-mode][arduino-mode.el]].
+  or using git
+  $ git clone git://github.com/bookest/arduino-mode.git
+- Add the following to your emacs init file
+  ;;(add-to-list 'load-path "~/.emacs.d/path/of/file"); only if arduino-mode.el is in a non-path folder
+  (setq auto-mode-alist (cons '("\\.\\(pde\\|ino\\)$" . arduino-mode) auto-mode-alist))
+  (autoload 'arduino-mode "arduino-mode" "Arduino editing mode." t)
+
+OUTSIDE EMACS(Not sure if that's possible)
+- Install Arduino-cli [[http://mjo.tc/atelier/2009/02/arduino-cli.html][tool]].
+  $ sudo aptitude install arduino-mk  -  Arhhh det er så v. 0.08. Nyeste er 0.1.
+
+- Manuel install af Arduino-cli
+  $ cd /usr/share/arduino/
+  $ sudo git clone git://github.com/mjoldfield/Arduino-Makefile.git
+  && sudo move Arduino-Makefile arduino-mk (kør ikke alligevel)
+- Set variables for the makefile in ~/.bashrc (could also be set locally in the project Makefile)
+  ARDUINO_DIR   = /usr/share/arduino
+  ARDMK_DIR     = /usr/local
+  AVR_TOOLS_DIR = /usr
+- Install needed stuff for the cli
+  $ sudo apt-get install libdevice-serialport-perl libyaml-perl
+
+
+Example makefile
+(examples are found in $ cd /usr/share/arduino/Arduino-Makefile/examples/)
+
+BOARD_TAG    = uno or 
+ARDUINO_PORT = /dev/cu.usb*
+ARDUINO_LIBS = 
+
+include ../../arduino-mk/Arduino.m
